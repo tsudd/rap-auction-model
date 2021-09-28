@@ -1,0 +1,15 @@
+@EndUserText.label: 'Access control for auction entity'
+@MappingRole: true
+define role ZI_KHR_AUCTION {
+    grant
+        select
+            on
+                ZI_KHR_AUCTION
+                    where
+//                         ( OverallStatus )
+//                         = aspect pfcg_auth( ZASTAT, ZASTAT, actvt = '03' )
+//                         and
+//                         CurrencyCode = 'USD';
+                           true;
+                        
+}

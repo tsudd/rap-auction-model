@@ -1,0 +1,11 @@
+@EndUserText.label: 'Access control for auction consumption CDS view'
+@MappingRole: true
+define role ZC_KHR_AUCTION {
+    grant
+        select
+            on
+                ZC_KHR_AUCTION
+                    where
+                        inheriting conditions from entity zi_khr_auction;
+                        
+}
