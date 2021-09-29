@@ -1,0 +1,133 @@
+managed;
+with draft;
+//strict;
+
+define behavior for zi_khr_auction alias Auction
+implementation in class zbp_i_khr_auction unique
+persistent table ZKHR_AUCTION
+draft table zkhr_daction
+lock master total etag LastChangedAt
+authorization master ( instance )
+etag master LocalLastChangedAt
+{
+  create;
+  update;
+  delete;
+  association _Bid { create; with draft; }
+  association _Item { create; with draft; }
+
+  field ( numbering : managed, readonly ) AuctionUuid;
+  field ( readonly ) AuctionId, OverallStatus, EndDate, HighestBid;
+  field ( readonly ) CreatedBy, CreatedAt, LastChangedBy, LastChangedAt, LocalLastChangedAt;
+  field ( mandatory ) Holderid;
+
+  action ( features: instance ) startBargaining result [1] $self;
+  action ( features: instance ) cancelAuction result [1] $self;
+//  action ( features: instance ) completeAuction result[1] $self;
+
+  determination calculateAuctionId on save {create;}
+  determination setAuctionStatus on save {create;}
+//  determination setHighestBit on save {create; update;}
+
+  validation validateHolder on save { field HolderId; create; update; }
+  validation validateDates on save { field ExparationDate, BeginDate, EndDate; create; update; }
+  validation validatePrices on save {field StartPrice, BidIncrement; create; update; }
+
+  draft determine action Prepare
+  {
+    validation validateHolder;
+    validation validateDates;
+    validation validatePrices;
+  }
+
+  mapping for zkhr_auction
+  {
+    AuctionUuid = auction_uuid;
+    AuctionId = auction_id;
+    HolderId = holder_id;
+    BeginDate = begin_date;
+    EndDate = end_date;
+    ExparationDate = exparation_date;
+    BidIncrement = bid_increment;
+    StartPrice = start_price;
+    Description = description;
+    CurrencyCode = currency_code;
+    OverallStatus = overall_status;
+    CreatedBy = created_by;
+    CreatedAt = created_at;
+    LastChangedBy = last_changed_by;
+    LastChangedAt = last_changed_at;
+    LocalLastChangedAt = local_last_changed_at;
+  }
+}
+
+define behavior for zi_khr_bid alias Bid
+implementation in class zbp_i_khr_bid unique
+persistent table ZKHR_BID
+draft table zkhr_dbid
+lock dependent by _Auction
+authorization dependent by _Auction
+etag master LocalLastChangedAt
+{
+//  create;
+  update;
+  delete;
+  field ( readonly ) AuctionUuid;
+  association _Auction { with draft; }
+
+  field ( numbering : managed, readonly ) BiddingUuid;
+  field ( readonly ) CreatedBy, BidDate, LastChangedBy, LocalLastChangedAt;
+  field ( readonly ) BiddingId;
+  field ( mandatory ) OwnerId, CurrencyCode;
+
+  determination calculateBiddingId on save {create;}
+
+  validation validateAmounts on save { field BidAmount; create; }
+  validation validateOwner on save { field OwnerId; create; }
+
+  mapping for zkhr_bid
+  {
+    BiddingUuid = bidding_uuid;
+    AuctionUuid = auction_uuid;
+    BiddingId = bidding_id;
+    OwnerId = owner_id;
+    BidDate = bid_date;
+    BidAmount = bid_amount;
+    CurrencyCode = currency_code;
+    CancelBidExplanation = cancel_bid_explanation;
+    CreatedBy = created_by;
+    LastChangedBy = last_changed_by;
+    LocalLastChangedAt = local_last_changed_at;
+  }
+}
+
+define behavior for zi_khr_itemm alias Item
+implementation in class zbp_i_khr_item unique
+persistent table ZKHR_ITEM
+draft table zkhr_ditem
+lock dependent by _Auction
+authorization dependent by _Auction
+etag master LocalLastChangedAt
+{
+  update;
+  delete;
+  field ( readonly ) AuctionUuid;
+  association _Auction { with draft; }
+
+  field ( numbering : managed, readonly ) ItemUuid;
+
+  mapping for zkhr_item
+  {
+    ItemUuid = item_uuid;
+    AuctionUuid = auction_uuid;
+    OwnerId = owner_id;
+    ItemId = item_id ;
+    ItemName = item_name;
+    ItemDescription = item_description;
+    ImageUrl = image_url;
+    Category = category;
+    CreatedBy = created_by;
+    LastChangedBy = last_changed_by;
+    LocalLastChangedAt = local_last_changed_at;
+  }
+}

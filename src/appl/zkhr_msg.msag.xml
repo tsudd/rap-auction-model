@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_MSAG" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <T100A>
+    <ARBGB>ZKHR_MSG</ARBGB>
+    <MASTERLANG>E</MASTERLANG>
+    <STEXT>Auction app messages</STEXT>
+   </T100A>
+   <T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZKHR_MSG</ARBGB>
+     <MSGNR>001</MSGNR>
+     <TEXT>Begin date &amp;1 must not be after exparation date &amp;2 for auction  &amp;3</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZKHR_MSG</ARBGB>
+     <MSGNR>002</MSGNR>
+     <TEXT>Exparation date &amp;1 must be after begin date &amp;2 for auction &amp;3</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZKHR_MSG</ARBGB>
+     <MSGNR>003</MSGNR>
+     <TEXT>Owner &amp;1 unknown</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZKHR_MSG</ARBGB>
+     <MSGNR>004</MSGNR>
+     <TEXT>Holder &amp;1 unknown</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZKHR_MSG</ARBGB>
+     <MSGNR>005</MSGNR>
+     <TEXT>You are not authorized to perform this activity</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZKHR_MSG</ARBGB>
+     <MSGNR>006</MSGNR>
+     <TEXT>Couldn&apos;t complete &amp;1, &apos;cause it hasn&apos;t been sold yet</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZKHR_MSG</ARBGB>
+     <MSGNR>008</MSGNR>
+     <TEXT>Couldn&apos;t change status of &amp;1 auction, &apos;cause it has been canceled</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZKHR_MSG</ARBGB>
+     <MSGNR>009</MSGNR>
+     <TEXT>Couldn&apos;t start bargaining: auction &amp;1 isn&apos;t ready</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZKHR_MSG</ARBGB>
+     <MSGNR>010</MSGNR>
+     <TEXT>Begin date &amp;1 before Today&apos;s date</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZKHR_MSG</ARBGB>
+     <MSGNR>011</MSGNR>
+     <TEXT>Price can&apos;t be lower than zero</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZKHR_MSG</ARBGB>
+     <MSGNR>012</MSGNR>
+     <TEXT>Bid increment can&apos;t be lower, that start auction price</TEXT>
+    </T100>
+   </T100>
+  </asx:values>
+ </asx:abap>
+</abapGit>

@@ -1,0 +1,86 @@
+@Metadata.layer: #CORE
+@UI: {
+  headerInfo: { typeName: 'Auction',
+                typeNamePlural: 'Auctions',
+                title: { type: #STANDARD, label: 'Auction', value: 'AuctionId' } },
+  presentationVariant: [{ sortOrder: [{ by: 'AuctionId', direction:  #DESC }] }] }
+annotate view zc_khr_auction with
+{
+  @UI.facet: [ { id:              'Auction',
+                   purpose:         #STANDARD,
+                   type:            #IDENTIFICATION_REFERENCE,
+                   label:           'Auction',
+                   position:        10 },
+                 { id:              'Booking',
+                   purpose:         #STANDARD,
+                   type:            #LINEITEM_REFERENCE,
+                   label:           'Bidding',
+                   position:        20,
+                   targetElement:   '_Bid'},
+                   { id:              'Items',
+                   purpose:         #STANDARD,
+                   type:            #LINEITEM_REFERENCE,
+                   label:           'Items',
+                   position:        30,
+                   targetElement:   '_Item'} ]
+
+
+  @UI:{ identification: [{ position: 1, label: 'Auction UUID' }] }
+  AuctionUuid;
+  @UI: {  lineItem:       [ { position: 10 } ],
+        identification: [ { position: 10 } ],
+        selectionField: [ { position: 10 } ] }
+  AuctionId;
+  @UI: {  lineItem:       [ { position: 20 } ],
+        identification: [ { position: 20 } ],
+        selectionField: [ { position: 20 } ] }
+  HolderId;
+  @UI: {  lineItem:       [ { position: 30 } ],
+        identification: [ { position: 30 } ],
+        selectionField: [ { position: 30 } ] }
+  CustomerName;
+  @UI: {  lineItem:       [ { position: 40 } ],
+        identification: [ { position: 40 } ],
+        selectionField: [ { position: 40 } ] }
+  BeginDate;
+  @UI: {  lineItem:       [ { position: 50 } ],
+        identification: [ { position: 50 } ],
+        selectionField: [ { position: 50 } ] }
+  EndDate;
+  @UI: {  lineItem:       [ { position: 60 } ],
+        identification: [ { position: 60 } ],
+        selectionField: [ { position: 60 } ] }
+  ExparationDate;
+  @UI: {  lineItem:       [ { position: 70 } ],
+        identification: [ { position: 70 } ],
+        selectionField: [ { position: 70 } ] }
+  BidIncrement;
+  @UI: {  lineItem:       [ { position: 80 } ],
+        identification: [ { position: 80 } ],
+        selectionField: [ { position: 80 } ] }
+  StartPrice;
+  @UI: {  lineItem:       [ { position: 81 } ],
+        selectionField: [ { position: 81 } ] }
+  HighestBid;
+  @UI: {  lineItem:       [ { position: 90 } ],
+        identification: [ { position: 90 } ],
+        selectionField: [ { position: 90 } ] }
+  Description;
+  @UI: {  lineItem:       [ { position: 100 } ],
+        identification: [ { position: 100 } ],
+        selectionField: [ { position: 100 } ] }
+  CurrencyCode;
+  @UI: {  lineItem:       [ { position: 110 },
+                            { type: #FOR_ACTION, dataAction: 'startBargaining', label: 'Start'},
+                            { type: #FOR_ACTION, dataAction: 'cancelAuction', label: 'Cancel'} ],
+        identification: [ { position: 110 },
+                            { type: #FOR_ACTION, dataAction: 'startBargaining', label: 'Start auction'},
+                            { type: #FOR_ACTION, dataAction: 'cancelAuction', label: 'Cancel'} ],
+        selectionField: [ { position: 110 } ] }
+  OverallStatus;
+  @UI.hidden: true
+  LastChangedAt;
+  @UI.hidden: true
+  LocalLastChangedAt;
+
+} 

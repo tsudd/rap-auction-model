@@ -1,0 +1,40 @@
+@Metadata.layer: #CORE
+@UI: {
+  headerInfo: { typeName: 'Item',
+                typeNamePlural: 'Items',
+                title: { type: #STANDARD, value: 'ItemId' } } }
+annotate view zc_khr_item with
+{
+  @UI.facet: [ { id:            'Bidding',
+                   purpose:       #STANDARD,
+                   type:          #IDENTIFICATION_REFERENCE,
+                   label:         'Bidding',
+                   position:      10 }  ]
+
+  @UI: { identification: [ { position: 10, label: 'Bidding UUID'  } ] }
+  ItemUuid;
+  @UI.hidden: true
+  AuctionUuid;
+  @UI: { lineItem:       [ { position: 20 } ],
+         identification: [ { position: 20 } ] }
+  OwnerId;
+  @UI: { lineItem:       [ { position: 30 } ],
+         identification: [ { position: 30 } ] }
+  OwnerName;
+  @Search.defaultSearchElement: true
+  ItemId;
+  @UI: { lineItem:       [ { position: 40 } ],
+         identification: [ { position: 40 } ] }
+  ItemName;
+  @UI: { lineItem:       [ { position: 50 } ],
+         identification: [ { position: 50 } ] }
+  ItemDescription;
+  @UI: { lineItem:       [ { position: 60 } ],
+         identification: [ { position: 60 } ] }
+  ImageUrl;
+  @UI: { lineItem:       [ { position: 70 } ],
+         identification: [ { position: 70 } ] }
+  Category;
+  @UI.hidden: true
+  LocalLastChangedAt;
+}

@@ -1,0 +1,40 @@
+@Metadata.layer: #CORE
+@UI: {
+  headerInfo: { typeName: 'Bidding',
+                typeNamePlural: 'Biddings',
+                title: { type: #STANDARD, value: 'BiddingId' } } }
+annotate view zc_khr_bid
+    with 
+{
+@UI.facet: [ { id:            'Bidding',
+                 purpose:       #STANDARD,
+                 type:          #IDENTIFICATION_REFERENCE,
+                 label:         'Bidding',
+                 position:      10 }  ]
+
+  @UI: { identification: [ { position: 10, label: 'Bidding UUID'  } ] }
+    BiddingUuid;
+    @UI.hidden: true
+    AuctionUuid;
+    @UI: { lineItem:       [ { position: 20 } ],
+         identification: [ { position: 20 } ] }
+    BiddingId;
+    @UI: { lineItem:       [ { position: 30 } ],
+         identification: [ { position: 30 } ] }
+    OwnerId;
+    @UI: { lineItem:       [ { position: 40 } ],
+         identification: [ { position: 40 } ] }
+    BidDate;
+    @UI: { lineItem:       [ { position: 50 } ],
+         identification: [ { position: 50 } ] }
+    BidAmount;
+    @UI: { lineItem:       [ { position: 60 } ],
+         identification: [ { position: 60 } ] }
+    CancelBidExplanation;
+    @UI: { lineItem:  [ { position: 70 } ],
+           identification: [ { position: 70 } ] }
+    CurrencyCode;
+    @UI.hidden: true
+    LocalLastChangedAt;
+    
+}
