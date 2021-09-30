@@ -118,6 +118,26 @@ class zcm_khr definition
         attr4 type scx_attrname value '',
       end of increment_bigger_start_price.
 
+    constants:
+      begin of negative_bid,
+        msgid type symsgid value 'ZKHR_MSG',
+        msgno type symsgno value '013',
+        attr1 type scx_attrname value '',
+        attr2 type scx_attrname value '',
+        attr3 type scx_attrname value '',
+        attr4 type scx_attrname value '',
+      end of negative_bid.
+
+    constants:
+      begin of low_bid_amount,
+        msgid type symsgid value 'ZKHR_MSG',
+        msgno type symsgno value '014',
+        attr1 type scx_attrname value 'STARTPRICE',
+        attr2 type scx_attrname value '',
+        attr3 type scx_attrname value '',
+        attr4 type scx_attrname value '',
+      end of low_bid_amount.
+
     methods constructor
       importing
         severity   type if_abap_behv_message=>t_severity default if_abap_behv_message=>severity-error
@@ -127,7 +147,9 @@ class zcm_khr definition
         enddate    type /dmo/end_date optional
         expdate    type /dmo/end_date optional
         auctionid  type zkhr_auction_id optional
-        customerid type /dmo/customer_id optional.
+        customerid type /dmo/customer_id optional
+        startprice type zkhr_start_price optional
+        .
 
     data begindate type /dmo/begin_date read-only.
     data enddate type /dmo/end_date read-only.
@@ -135,6 +157,7 @@ class zcm_khr definition
     data auctionid type string read-only.
     data ownerid type string read-only.
     data holderid type string read-only.
+    data startprice type string read-only.
   protected section.
   private section.
 endclass.
@@ -156,7 +179,7 @@ class zcm_khr implementation.
     me->auctionid = |{ auctionid alpha = out }|.
     me->ownerid = |{ customerid alpha = out }|.
     me->holderid = |{ customerid alpha = out }|.
-
+    me->startprice = |{ startprice }|.
     clear me->textid.
     if textid is initial.
       if_t100_message~t100key = if_t100_message=>default_textid.

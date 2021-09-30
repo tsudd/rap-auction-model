@@ -54,6 +54,8 @@ class lhc_Auction definition inheriting from cl_abap_behavior_handler.
 
     methods validatePrices for validate on save
       importing keys for Auction~validatePrices.
+    methods setBidCurrencyCodes for determine on save
+      importing keys for Auction~setBidCurrencyCodes.
 
 *    methods change_status for modify
 *        importing ks for update zi_khr_auction.
@@ -321,7 +323,7 @@ class lhc_Auction implementation.
   method validateDates.
     read entities of zi_khr_auction in local mode
       entity Auction
-        fields ( AuctionId BeginDate EndDate ) with corresponding #( keys )
+        fields ( AuctionId BeginDate EndDate ExparationDate ) with corresponding #( keys )
       result data(auctions).
 
     loop at auctions into data(auction).
@@ -342,16 +344,16 @@ class lhc_Auction implementation.
                         %element-BeginDate = if_abap_behv=>mk-on
                         %element-ExparationDate   = if_abap_behv=>mk-on ) to reported-auction.
 
-      elseif auction-BeginDate < cl_abap_context_info=>get_system_date( ).
-        append value #( %tky               = auction-%tky ) to failed-auction.
-        append value #( %tky               = auction-%tky
-                        %state_area        = 'VALIDATE_DATES'
-                        %msg               = new zcm_khr(
-                                                 severity  = if_abap_behv_message=>severity-error
-                                                 textid    = zcm_khr=>begin_date_before_sys
-                                                 begindate = auction-BeginDate
-                                                 auctionid = auction-AuctionId )
-                        %element-BeginDate = if_abap_behv=>mk-on ) to reported-auction.
+*      elseif auction-BeginDate < cl_abap_context_info=>get_system_date( ).
+*        append value #( %tky               = auction-%tky ) to failed-auction.
+*        append value #( %tky               = auction-%tky
+*                        %state_area        = 'VALIDATE_DATES'
+*                        %msg               = new zcm_khr(
+*                                                 severity  = if_abap_behv_message=>severity-error
+*                                                 textid    = zcm_khr=>begin_date_before_sys
+*                                                 begindate = auction-BeginDate
+*                                                 auctionid = auction-AuctionId )
+*                        %element-BeginDate = if_abap_behv=>mk-on ) to reported-auction.
       endif.
     endloop.
   endmethod.
@@ -571,5 +573,20 @@ class lhc_Auction implementation.
     update_granted = cond #( when sy-subrc = 0 then abap_true else abap_false ).
     update_granted = abap_true. " full access for testing
   endmethod.
+
+  METHOD setBidCurrencyCodes.
+    read entities of zi_khr_auction in local mode
+        entity Auction by \_Bid
+        fields ( BiddingUuid )
+        with corresponding #( keys )
+        result data(biddings)
+        failed data(read_failed).
+
+    modify entities of zi_khr_auction in local mode
+        entity Bid
+            execute setCurrencyCode
+            from corresponding #( biddings )
+        reported data(set_reported).
+  ENDMETHOD.
 
 endclass.

@@ -4,7 +4,7 @@ with draft;
 
 define behavior for zi_khr_auction alias Auction
 implementation in class zbp_i_khr_auction unique
-persistent table ZKHR_AUCTION
+persistent table zkhr_auction
 draft table zkhr_daction
 lock master total etag LastChangedAt
 authorization master ( instance )
@@ -21,17 +21,18 @@ etag master LocalLastChangedAt
   field ( readonly ) CreatedBy, CreatedAt, LastChangedBy, LastChangedAt, LocalLastChangedAt;
   field ( mandatory ) Holderid;
 
-  action ( features: instance ) startBargaining result [1] $self;
-  action ( features: instance ) cancelAuction result [1] $self;
-//  action ( features: instance ) completeAuction result[1] $self;
+  action ( features : instance ) startBargaining result [1] $self;
+  action ( features : instance ) cancelAuction result [1] $self;
+  //  action ( features: instance ) completeAuction result[1] $self;
 
-  determination calculateAuctionId on save {create;}
-  determination setAuctionStatus on save {create;}
-//  determination setHighestBit on save {create; update;}
+  determination calculateAuctionId on save { create; }
+  determination setAuctionStatus on save { create; }
+  //  determination setHighestBit on save {create; update;}
+  determination setBidCurrencyCodes on save { field CurrencyCode, StartPrice, BidIncrement; }
 
   validation validateHolder on save { field HolderId; create; update; }
   validation validateDates on save { field ExparationDate, BeginDate, EndDate; create; update; }
-  validation validatePrices on save {field StartPrice, BidIncrement; create; update; }
+  validation validatePrices on save { field StartPrice, BidIncrement; create; update; }
 
   draft determine action Prepare
   {
@@ -63,13 +64,13 @@ etag master LocalLastChangedAt
 
 define behavior for zi_khr_bid alias Bid
 implementation in class zbp_i_khr_bid unique
-persistent table ZKHR_BID
+persistent table zkhr_bid
 draft table zkhr_dbid
 lock dependent by _Auction
 authorization dependent by _Auction
 etag master LocalLastChangedAt
 {
-//  create;
+  //  create;
   update;
   delete;
   field ( readonly ) AuctionUuid;
@@ -77,13 +78,25 @@ etag master LocalLastChangedAt
 
   field ( numbering : managed, readonly ) BiddingUuid;
   field ( readonly ) CreatedBy, BidDate, LastChangedBy, LocalLastChangedAt;
-  field ( readonly ) BiddingId;
-  field ( mandatory ) OwnerId, CurrencyCode;
+  field ( readonly ) BiddingId, CurrencyCode;
+  field ( mandatory ) OwnerId;
 
-  determination calculateBiddingId on save {create;}
+  determination calculateBiddingId on save { field BiddingId; create; }
+//  determination setCurrencyCode on save { field CurrencyCode; } //does not work
 
-  validation validateAmounts on save { field BidAmount; create; }
-  validation validateOwner on save { field OwnerId; create; }
+  validation validateAmounts on save  { field BidAmount; create; update; } //does not work
+  validation validateOwner on save { field OwnerId; create; update; } //does not work
+
+  action ( features : instance ) acceptBid; // does not implemented
+  action ( features : instance ) rejectBid; // does not implemented
+  internal action setCurrencyCode;
+
+//  draft determine action Prepare
+//  {
+//    validation validateHolder;
+//    validation validateDates;
+//    validation validatePrices;
+//  }
 
   mapping for zkhr_bid
   {
@@ -103,7 +116,7 @@ etag master LocalLastChangedAt
 
 define behavior for zi_khr_itemm alias Item
 implementation in class zbp_i_khr_item unique
-persistent table ZKHR_ITEM
+persistent table zkhr_item
 draft table zkhr_ditem
 lock dependent by _Auction
 authorization dependent by _Auction
@@ -121,7 +134,7 @@ etag master LocalLastChangedAt
     ItemUuid = item_uuid;
     AuctionUuid = auction_uuid;
     OwnerId = owner_id;
-    ItemId = item_id ;
+    ItemId = item_id;
     ItemName = item_name;
     ItemDescription = item_description;
     ImageUrl = image_url;

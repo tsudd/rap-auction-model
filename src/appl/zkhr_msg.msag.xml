@@ -74,6 +74,18 @@
      <MSGNR>012</MSGNR>
      <TEXT>Bid increment can&apos;t be lower, that start auction price</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZKHR_MSG</ARBGB>
+     <MSGNR>013</MSGNR>
+     <TEXT>Bid amount must be more than zero</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZKHR_MSG</ARBGB>
+     <MSGNR>014</MSGNR>
+     <TEXT>Bid amount must be more than &amp;1</TEXT>
+    </T100>
    </T100>
   </asx:values>
  </asx:abap>
