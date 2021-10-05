@@ -14,7 +14,7 @@ define view zb_khr_bid
       bid_amount             as BidAmount,
       currency_code          as CurrencyCode,
       cancel_bid_explanation as CancelBidExplanation,
-      created_by             as CreatedBy,
-      last_changed_by        as LastChangedBy,
-      local_last_changed_at  as LocalLastChangedAt
+      local_last_changed_at  as LocalLastChangedAt,
+      createdby              as CreatedBy,
+      lastchangedby          as LastChangedBy
 }

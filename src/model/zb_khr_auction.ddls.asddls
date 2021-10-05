@@ -15,9 +15,9 @@ define view zb_khr_auction as select from zkhr_auction {
     description as Description,
     currency_code as CurrencyCode,
     overall_status as OverallStatus,
-    created_by as CreatedBy,
-    created_at as CreatedAt,
-    last_changed_by as LastChangedBy,
-    last_changed_at as LastChangedAt,
+    createdat as CreatedAt,
+    createdby as CreatedBy,
+    lastchangedat as LastChangedAt,
+    lastchangedby as LastChangedBy,
     local_last_changed_at as LocalLastChangedAt
 }

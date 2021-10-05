@@ -26,7 +26,7 @@ define root view entity zi_khr_auction
       OverallStatus,
       
       _MaxBid.HighestBidAmount as HighestBid,
-      @Semantics.user.createdBy: true
+       @Semantics.user.createdBy: true
       CreatedBy,
       @Semantics.systemDateTime.createdAt: true
       CreatedAt,
@@ -34,6 +34,7 @@ define root view entity zi_khr_auction
       LastChangedBy,
       @Semantics.systemDateTime.lastChangedAt: true
       LastChangedAt,
+      
       @Semantics.systemDateTime.localInstanceLastChangedAt: true
       LocalLastChangedAt,
 

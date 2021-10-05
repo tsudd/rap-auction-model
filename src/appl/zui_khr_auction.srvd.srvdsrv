@@ -1,0 +1,8 @@
+@EndUserText.label: 'Service definition for Auction App'
+define service Zui_khr_auction {
+  expose zc_khr_auction as Auction;
+  expose zc_khr_bid as Bidding;
+  expose zc_khr_item as Item;
+  expose /DMO/I_Customer as Customer;
+  expose I_Currency as Currency;
+}

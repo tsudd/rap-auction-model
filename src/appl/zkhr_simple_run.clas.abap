@@ -69,7 +69,29 @@ class zkhr_simple_run implementation.
 *    enddo.
 *    out->write( |Generating done.| ).
 
-    generate_biddings(  ).
+*    data statuses type table of zkhr_auction_sts.
+*
+*    statuses = value #(
+*    ( id = '0001' status = 'P' description = 'Prepairing' )
+*    ( id = '0002' status = 'B' description = 'Bargaining' )
+*    ( id = '0003' status = 'S' description = 'Sold' )
+*    ( id = '0004' status = 'C' description = 'Completed' )
+*    ( id = '0005' status = 'X' description = 'Cancelled' )
+*    ( id = '0006' status = 'R' description = 'Reviewing' )
+*    ( id = '0007' status = 'D' description = 'Prepaired for bidding' ) ).
+*    delete from zkhr_auction_sts.
+*    insert zkhr_auction_sts from table @statuses.
+
+    data categories type table of zkhr_auction_cat.
+
+    categories = value #(
+    ( category = 'AS' description = 'Assets' )
+    ( category = 'RE' description = 'Real estate' )
+    ( category = 'AR' description = 'Art' ) ).
+
+    delete from zkhr_auction_cat.
+    insert zkhr_auction_cat from table @categories.
+    out->write( |Done.| ).
   endmethod.
   method add_bids.
 

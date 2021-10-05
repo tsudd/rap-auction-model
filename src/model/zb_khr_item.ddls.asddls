@@ -14,7 +14,7 @@ define view zb_khr_item
       item_description      as ItemDescription,
       image_url             as ImageUrl,
       category              as Category,
-      created_by            as CreatedBy,
-      last_changed_by       as LastChangedBy,
+      createdby            as CreatedBy,
+      lastchangedby       as LastChangedBy,
       local_last_changed_at as LocalLastChangedAt
 }

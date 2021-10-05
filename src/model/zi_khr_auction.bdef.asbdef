@@ -18,7 +18,7 @@ etag master LocalLastChangedAt
 
   field ( numbering : managed, readonly ) AuctionUuid;
   field ( readonly ) AuctionId, OverallStatus, EndDate, HighestBid;
-  field ( readonly ) CreatedBy, CreatedAt, LastChangedBy, LastChangedAt, LocalLastChangedAt;
+  field ( readonly ) LastChangedBy, CreatedAt, LastChangedAt, LocalLastChangedAt;
   field ( mandatory ) Holderid;
 
   action ( features : instance ) startBargaining result [1] $self;
@@ -54,10 +54,10 @@ etag master LocalLastChangedAt
     Description = description;
     CurrencyCode = currency_code;
     OverallStatus = overall_status;
-    CreatedBy = created_by;
-    CreatedAt = created_at;
-    LastChangedBy = last_changed_by;
-    LastChangedAt = last_changed_at;
+    CreatedBy = createdby;
+    CreatedAt = createdat;
+    LastChangedBy = lastchangedby;
+    LastChangedAt = lastchangedat;
     LocalLastChangedAt = local_last_changed_at;
   }
 }
@@ -108,8 +108,8 @@ etag master LocalLastChangedAt
     BidAmount = bid_amount;
     CurrencyCode = currency_code;
     CancelBidExplanation = cancel_bid_explanation;
-    CreatedBy = created_by;
-    LastChangedBy = last_changed_by;
+    CreatedBy = createdby;
+    LastChangedBy = lastchangedby;
     LocalLastChangedAt = local_last_changed_at;
   }
 }

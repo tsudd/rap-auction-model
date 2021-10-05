@@ -79,8 +79,6 @@ annotate view zc_khr_auction with
         selectionField: [ { position: 110 } ] }
   OverallStatus;
   @UI.hidden: true
-  LastChangedAt;
-  @UI.hidden: true
   LocalLastChangedAt;
 
 } 
