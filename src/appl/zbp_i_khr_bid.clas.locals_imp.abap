@@ -81,24 +81,26 @@ class lhc_Bid implementation.
 
     if auctions is not initial.
       read entities of zi_khr_auction in local mode
-          entity Bid by \_Auction
+          entity Auction
           fields ( BidIncrement StartPrice AuctionUuid HighestBid ) with corresponding #( auctions )
       result data(auctions_db).
     endif.
 
-*    loop at biddings into data(bid).
-*      append value #( %tky = bid-%tky
-*                      %state_area = 'VALIDATE_AMOUNTS' )
-*      to reported-bid.
-*
-*      if bid-BidAmount < 0.
-*        append value #( %tky = bid-%tky ) to failed-bid.
-*        append value #( %tky = bid-%tky
-*                        %state_area = 'VALIDATE_AMOUNTS'
-*                        %msg = new zcm_khr( severity = if_abap_behv_message=>severity-error
-*                                            textid = zcm_khr=>negative_bid )
-*                        %element-BidAmount = if_abap_behv=>mk-on )
-*        to reported-bid.
+    loop at biddings into data(bid).
+*      if not line_exists( auctions_db[ AuctionUuid = bid-AuctionUuid ] ).
+*        continue.
+*      endif.
+*      data(ref_auction) = auctions_db[ AuctionUuid = bid-AuctionUuid ].
+
+      if bid-BidAmount < 0.
+        append value #( %tky = bid-%tky ) to failed-bid.
+        append value #( %tky = bid-%tky
+                        %state_area = 'VALIDATE_AMOUNT'
+                        %msg = new zcm_khr( severity = if_abap_behv_message=>severity-error
+                                            textid = zcm_khr=>negative_price )
+                        %element-BidAmount = if_abap_behv=>mk-on
+                        %path = value #( auction-AuctionUuid = bid-AuctionUuid ) )
+        to reported-bid.
 *      else.
 *        data(linked_auction) = auctions_db[ AuctionUuid = bid-AuctionUuid ].
 *        if linked_auction-HighestBid = 0 and linked_auction-StartPrice > bid-BidAmount.
@@ -121,8 +123,12 @@ class lhc_Bid implementation.
 *                          %element-BidAmount = if_abap_behv=>mk-on )
 *          to reported-bid.
 *        endif.
-*      endif.
-*    endloop.
+      else.
+        append value #( %tky = bid-%tky
+                      %state_area = 'VALIDATE_AMOUNT' )
+      to reported-bid.
+      endif.
+    endloop.
   endmethod.
 
   method validateOwner.
@@ -198,8 +204,7 @@ class lhc_Bid implementation.
                           ( %is_draft = if_abap_behv=>mk-off
                             BiddingUuid = bid-BiddingUuid
                             CurrencyCode = auctions_db[ auction_uuid = bid-AuctionUuid ]-currency_code ) )
-    reported data(update_reported)
-    failed data(blyat).
+    reported data(update_reported).
 
 
     reported = corresponding #( deep update_reported ).

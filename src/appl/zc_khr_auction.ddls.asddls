@@ -1,4 +1,4 @@
-@EndUserText.label: 'Auction consumption CDS view'
+    @EndUserText.label: 'Auction consumption CDS view'
 @AccessControl.authorizationCheck: #CHECK
 @Search.searchable: true
 @Metadata.allowExtensions: true
@@ -12,15 +12,21 @@ define root view entity zc_khr_auction
       @ObjectModel.text.element: ['CustomerName']
       @Search.defaultSearchElement: true
       HolderId,
+      @Consumption.valueHelpDefinition: [{ entity: { name: '/DMO/I_Customer', element: 'LastName'} }]
+      @Search.fuzzinessThreshold: 0.8
       _Customer.LastName as CustomerName,
+      @Consumption.filter: { selectionType: #INTERVAL, multipleSelections: false }
       BeginDate,
+      @Consumption.filter: { selectionType: #INTERVAL, multipleSelections: false }
       EndDate,
+      @Consumption.filter: { selectionType: #INTERVAL, multipleSelections: false }
       ExparationDate,
       @Semantics.amount.currencyCode: 'CurrencyCode'
       BidIncrement,
       @Semantics.amount.currencyCode: 'CurrencyCode'
       StartPrice,
       HighestBid,
+      @Search.fuzzinessThreshold: 0.2
       Description,
       @Consumption.valueHelpDefinition: [{ entity: { name: 'I_Currency', element: 'Currency'} }]
       CurrencyCode,

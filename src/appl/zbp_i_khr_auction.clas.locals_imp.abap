@@ -1,4 +1,6 @@
-class lhc_Auction definition inheriting from cl_abap_behavior_handler.
+class test_auction_beh definition deferred for testing.
+
+class lhc_Auction definition inheriting from cl_abap_behavior_handler friends test_auction_beh.
   public section.
     constants:
       begin of auction_status,
@@ -10,6 +12,9 @@ class lhc_Auction definition inheriting from cl_abap_behavior_handler.
         ready      type c length 1 value 'D',
         canceled   type c length 1 value 'X',
       end of auction_status.
+
+    constants:
+                 sum_bid_id type c length 4 value '0000'.
   private section.
 
     methods get_instance_features for instance features
@@ -31,9 +36,6 @@ class lhc_Auction definition inheriting from cl_abap_behavior_handler.
     methods cancelAuction for modify
       importing keys for action Auction~cancelAuction result result.
 
-*    methods completeAuction for modify
-*      importing keys for action Auction~completeAuction result result.
-
     methods startBargaining for modify
       importing keys for action Auction~startBargaining result result.
 
@@ -43,8 +45,8 @@ class lhc_Auction definition inheriting from cl_abap_behavior_handler.
     methods setAuctionStatus for determine on save
       importing keys for Auction~setAuctionStatus.
 
-*    methods setHighestBid for determine on save
-*      importing keys for Auction~setHighestBit.
+    methods setAllBidding for determine on save
+      importing keys for Auction~setAllBidding.
 
     methods validateDates for validate on save
       importing keys for Auction~validateDates.
@@ -54,11 +56,9 @@ class lhc_Auction definition inheriting from cl_abap_behavior_handler.
 
     methods validatePrices for validate on save
       importing keys for Auction~validatePrices.
-    methods setBidCurrencyCodes for determine on save
-      importing keys for Auction~setBidCurrencyCodes.
 
-*    methods change_status for modify
-*        importing ks for update zi_khr_auction.
+    methods setBidCurrencyCodes for modify
+      importing keys for action  Auction~setBidCurrencyCodes.
 
 endclass.
 
@@ -190,57 +190,6 @@ class lhc_Auction implementation.
 *    result = change_status( keys = keys status = auction_status-canceled ).
   endmethod.
 
-*  method completeAuction.
-*    read entities of zi_khr_auction in local mode
-*        entity Auction
-*            fields ( OverallStatus AuctionId )
-*            with corresponding #( keys )
-*            result data(read_auctions_result).
-*
-*    data keys_to_update like keys.
-*    data keys_to_error like keys.
-*    loop at read_auctions_result into data(auction).
-*      if auction-OverallStatus = auction_status-sold.
-*        insert corresponding #( auction ) into table keys_to_update.
-*      else.
-*        insert corresponding #( auction ) into table keys_to_error.
-*      endif.
-*    endloop.
-*
-*    modify entities of zi_khr_auction in local mode
-*          entity Auction
-*              update
-*                  fields ( OverallStatus )
-*                  with value #( for key in keys_to_update
-*                                  ( %tky = key-%tky
-*                                    OverallStatus = auction_status-completed ) )
-*              failed failed
-*              reported reported.
-*
-*    loop at keys_to_error into data(k).
-*      " couldn't use insert because of implicit index
-*      append value #( %tky = k-%tky ) to failed-auction.
-*
-*      append value #( %tky = k-%tky
-*              %state_area = 'AUCTION_COMPLETION'
-*              %msg = cond #( when read_auctions_result[ AuctionUuid = k-AuctionUuid ]-OverallStatus  = 'C'
-*                     then new zcm_khr( severity = if_abap_behv_message=>severity-error
-*                                       textid = zcm_khr=>canceled_auction
-*                                       auctionid = read_auctions_result[ AuctionUuid = k-AuctionUuid ]-AuctionId )
-*                     else new zcm_khr( severity = if_abap_behv_message=>severity-error
-*                                       textid = zcm_khr=>canceled_auction
-*                                       auctionid = read_auctions_result[ AuctionUuid = k-AuctionUuid ]-AuctionId ) ) )
-*        to reported-auction.
-*    endloop.
-*
-*    read entities of zi_khr_auction in local mode
-*        entity Auction
-*            all fields with corresponding #( keys_to_update )
-*            result data(updated_auctions).
-*    result = value #( for auc in updated_auctions
-*                        ( %tky = auc-%tky
-*                          %param = auc ) ).
-*  endmethod.
 
   method startBargaining.
     read entities of zi_khr_auction in local mode
@@ -305,7 +254,7 @@ class lhc_Auction implementation.
 
     select single
         from  zi_khr_auction
-        fields max( AuctionId ) as AuctionID
+        fields max( AuctionId ) as AuctionID "wrong, but what about ETag and draft concept?
         into @data(max_auctionid).
 
     modify entities of zi_khr_auction in local mode
@@ -327,10 +276,6 @@ class lhc_Auction implementation.
       result data(auctions).
 
     loop at auctions into data(auction).
-      append value #(  %tky        = auction-%tky
-                       %state_area = 'VALIDATE_DATES' )
-        to reported-auction.
-
       if auction-ExparationDate < auction-BeginDate.
         append value #( %tky = auction-%tky ) to failed-auction.
         append value #( %tky               = auction-%tky
@@ -343,17 +288,10 @@ class lhc_Auction implementation.
                                                  auctionid  = auction-AuctionId )
                         %element-BeginDate = if_abap_behv=>mk-on
                         %element-ExparationDate   = if_abap_behv=>mk-on ) to reported-auction.
-
-*      elseif auction-BeginDate < cl_abap_context_info=>get_system_date( ).
-*        append value #( %tky               = auction-%tky ) to failed-auction.
-*        append value #( %tky               = auction-%tky
-*                        %state_area        = 'VALIDATE_DATES'
-*                        %msg               = new zcm_khr(
-*                                                 severity  = if_abap_behv_message=>severity-error
-*                                                 textid    = zcm_khr=>begin_date_before_sys
-*                                                 begindate = auction-BeginDate
-*                                                 auctionid = auction-AuctionId )
-*                        %element-BeginDate = if_abap_behv=>mk-on ) to reported-auction.
+      else.
+        append value #(  %tky        = auction-%tky
+                       %state_area = 'VALIDATE_DATES' )
+        to reported-auction.
       endif.
     endloop.
   endmethod.
@@ -435,25 +373,6 @@ class lhc_Auction implementation.
     endloop.
   endmethod.
 
-*  method change_status.
-*    modify entities of zi_khr_auction in local mode
-*        entity Auction
-*            update
-*                fields ( OverallStatus )
-*                with value #( for key in keys
-*                                ( %tky = key-%tky
-*                                  OverallStatus = auction_status-canceled ) )
-*            failed data(failed)
-*            reported data(reported).
-*    read entities of zi_khr_auction in local mode
-*        entity Auction
-*            all fields with corresponding #( keys )
-*            result data(auctions).
-*    result = value #( for auction in auctions
-*                        ( %tky = auction-%tky
-*                          %param = auction ) ).
-*  endmethod.
-
   method setauctionstatus.
     read entities of zi_khr_auction in local mode
       entity Auction
@@ -474,67 +393,6 @@ class lhc_Auction implementation.
 
     reported = corresponding #( deep update_reported ).
   endmethod.
-
-*  method sethighestbid.
-*    types:
-*        begin of amounts_per_cur,
-*            amount type zkhr_bid_amount,
-*            currency_code type /dmo/currency_code,
-*            end of amounts_per_cur.
-*
-*    data amounts type standard table of amounts_per_cur with default key.
-*
-*    read entities of zi_khr_auction in local mode
-*      entity Auction
-*        fields ( StartPrice BidIncrement CurrencyCode )
-*        with corresponding #( keys )
-*      result data(auctions).
-*
-*    delete auctions where CurrencyCode is initial.
-*
-*    loop at auctions reference into data(auction).
-*
-*        amounts = value #( ( amount = auction->StartPrice
-*                             currency_code = auction->CurrencyCode ) ).
-*
-*        read entities of zi_khr_auction in local mode
-*            entity Auction by \_Bid
-*                fields ( BidAmount CurrencyCode )
-*            with value #( ( %tky = auction->%tky ) )
-*            result data(biddings).
-*
-*        loop at biddings into data(bid) where CurrencyCode is not initial.
-*            collect value amounts_per_cur( amount = bid-BidAmount
-*                                           currency_code = bid-CurrencyCode ) into amounts.
-*        endloop.
-*
-*        clear auction->HighestBid.
-*        loop at amounts into data(single_amount) where currency_code <> auction->CurrencyCode.
-*            /dmo/cl_flight_amdp=>convert_currency(
-*                exporting
-*                    iv_amount = single_amount-amount
-*                    iv_currency_code_source = single_amount-currency_code
-*                    iv_currency_code_target = auction->CurrencyCode
-*                    iv_exchange_rate_date = cl_abap_context_info=>get_system_date(  )
-*                importing
-*                    ev_amount = data(new_price)
-*             ).
-*             amounts[ sy-tabix ]-amount = new_price.
-*             amounts[ sy-tabix ]-currency_code = auction->CurrencyCode.
-*        endloop.
-*
-*        select single from @amounts as amnts fields max( amnts~amount ) as max into @data(result).
-*
-*        auction->HighestBid = result.
-*
-*    endloop.
-*
-*    modify entities of zi_khr_auction in local mode
-*        entity Auction
-*            update fields ( HighestBid )
-*            with corresponding #( auctions ).
-*
-*  endmethod.
 
   method is_create_granted.
     authority-check object 'ZASTAT'
@@ -574,7 +432,7 @@ class lhc_Auction implementation.
     update_granted = abap_true. " full access for testing
   endmethod.
 
-  METHOD setBidCurrencyCodes.
+  method setBidCurrencyCodes.
     read entities of zi_khr_auction in local mode
         entity Auction by \_Bid
         fields ( BiddingUuid )
@@ -587,6 +445,88 @@ class lhc_Auction implementation.
             execute setCurrencyCode
             from corresponding #( biddings )
         reported data(set_reported).
-  ENDMETHOD.
+  endmethod.
+
+  method setallbidding.
+    data biddings_upd type table for update zi_khr_auction\\Bid.
+    data biddings_crt type standard table of zkhr_bid with default key.
+
+    read entities of zi_khr_auction in local mode
+        entity Auction by \_Bid
+        fields ( BiddingId BidAmount )
+        with corresponding #( keys )
+    result data(biddings)
+    failed data(failed_bids)
+    reported data(reported_bids).
+
+    loop at keys into data(k).
+      data sum_bid like line of biddings.
+      sum_bid = value #( BiddingId = sum_bid_id BidDate = cl_abap_context_info=>get_system_date(  ) ).
+      loop at biddings into data(bid) where BiddingId > sum_bid_id and AuctionUuid = k-AuctionUuid.
+        sum_bid-BidAmount += bid-BidAmount.
+      endloop.
+
+      if line_exists( biddings[ BiddingId = sum_bid_id AuctionUuid = k-AuctionUuid ] ).
+        insert value #( %tky = k-%tky
+                        BiddingId = sum_bid-BiddingId
+                        BidDate = sum_bid-BidDate
+                        BiddingUuid = biddings[ BiddingId = sum_bid_id
+                                                AuctionUuid = k-AuctionUuid ]-BiddingUuid ) into table biddings_upd.
+      else.
+*        modify entities of zi_khr_auction in local mode
+*        entity Auction
+*            update fields ( AuctionUuid ) with value #( ( %cid = 'nice'
+*                                                          %is_draft            = if_abap_behv=>mk-off
+*                                                          AuctionUuid = k-AuctionUuid ) )
+*            create by \_Bid
+*            fields ( BiddingId BidDate BidAmount ) with value #( ( %cid_ref = 'nice'
+*                                                                   %target = value #( ( %cid = 'bruh'
+*                                                                                        %is_draft    = if_abap_behv=>mk-off
+*                                                                                        BiddingId = sum_bid-BiddingId
+*                                                                                        BidAmount = sum_bid-BidAmount
+*                                                                                        BidDate = sum_bid-BidDate ) ) ) )
+*        mapped data(mapped_b)
+*        failed data(failed_b)
+*        reported data(rep_crt).
+
+        insert value #( bidding_id = sum_bid-BiddingId
+                        bid_date = sum_bid-BidDate
+                        auction_uuid = k-AuctionUuid
+                        bid_amount = sum_bid-BidAmount ) into table biddings_crt.
+*        insert value #( BiddingId = sum_bid-BiddingId ) into table zkhr_bid.
+      endif.
+    endloop.
+
+    modify entities of zi_khr_auction in local mode
+        entity Bid
+        update fields ( BiddingId BidAmount BidDate ) with biddings_upd
+        reported data(reported_upd).
+
+    insert zkhr_bid from table @biddings_crt.
+
+    reported = corresponding #( deep reported_upd ).
+*    move-corresponding reported_crt-bid to reported-bid.
+  endmethod.
+
+endclass.
+
+class lcl_behavior_saver definition inheriting from cl_abap_behavior_saver
+    abstract final.
+
+  protected section.
+*  methods finalize redefinition.
+**        methods check_before_save redefinition.
+**        methods adjust_numbers redefinition.
+*  methods save redefinition.
+*        methods cleanup redefinition.
+    methods save_modified redefinition.
+endclass.
+
+class lcl_behavior_saver implementation.
+
+
+  method save_modified.
+    data(nice) = 1 + 1.
+  endmethod.
 
 endclass.

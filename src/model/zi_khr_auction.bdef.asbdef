@@ -5,6 +5,7 @@ with draft;
 define behavior for zi_khr_auction alias Auction
 implementation in class zbp_i_khr_auction unique
 persistent table zkhr_auction
+with additional save
 draft table zkhr_daction
 lock master total etag LastChangedAt
 authorization master ( instance )
@@ -27,8 +28,9 @@ etag master LocalLastChangedAt
 
   determination calculateAuctionId on save { create; }
   determination setAuctionStatus on save { create; }
+  determination setAllBidding on save {create; update;} //doesn't work
   //  determination setHighestBit on save {create; update;}
-  determination setBidCurrencyCodes on save { field CurrencyCode, StartPrice, BidIncrement; }
+  internal action setBidCurrencyCodes;
 
   validation validateHolder on save { field HolderId; create; update; }
   validation validateDates on save { field ExparationDate, BeginDate, EndDate; create; update; }
@@ -70,7 +72,6 @@ lock dependent by _Auction
 authorization dependent by _Auction
 etag master LocalLastChangedAt
 {
-  //  create;
   update;
   delete;
   field ( readonly ) AuctionUuid;
@@ -82,7 +83,7 @@ etag master LocalLastChangedAt
   field ( mandatory ) OwnerId;
 
   determination calculateBiddingId on save { field BiddingId; create; }
-//  determination setCurrencyCode on save { field CurrencyCode; } //does not work
+//  setCurrencyCode on save { field CurrencyCode; } //does not work
 
   validation validateAmounts on save  { field BidAmount; create; update; } //does not work
   validation validateOwner on save { field OwnerId; create; update; } //does not work
@@ -139,8 +140,8 @@ etag master LocalLastChangedAt
     ItemDescription = item_description;
     ImageUrl = image_url;
     Category = category;
-    CreatedBy = created_by;
-    LastChangedBy = last_changed_by;
+    CreatedBy = createdby;
+    LastChangedBy = lastchangedby;
     LocalLastChangedAt = local_last_changed_at;
   }
 }

@@ -70,7 +70,7 @@ class zcm_khr definition
 
     constants:
       begin of unsold_auction,
-        msgid type symsgid value 'zkhr_msg',
+        msgid type symsgid value 'ZKHR_MSG',
         msgno type symsgno value '006',
         attr1 type scx_attrname value 'AUCTIONID',
         attr2 type scx_attrname value '',

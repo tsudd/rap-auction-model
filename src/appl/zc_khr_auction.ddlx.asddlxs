@@ -11,7 +11,7 @@ annotate view zc_khr_auction with
                    type:            #IDENTIFICATION_REFERENCE,
                    label:           'Auction',
                    position:        10 },
-                 { id:              'Booking',
+                 { id:              'Bidding',
                    purpose:         #STANDARD,
                    type:            #LINEITEM_REFERENCE,
                    label:           'Bidding',
