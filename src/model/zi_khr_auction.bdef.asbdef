@@ -28,9 +28,9 @@ etag master LocalLastChangedAt
 
   determination calculateAuctionId on save { create; }
   determination setAuctionStatus on save { create; }
-  determination setAllBidding on save {create; update;} //doesn't work
+//  determination setAllBidding on save {create; update;} //doesn't work
   //  determination setHighestBit on save {create; update;}
-  internal action setBidCurrencyCodes;
+//  internal action setBidCurrencyCodes;
 
   validation validateHolder on save { field HolderId; create; update; }
   validation validateDates on save { field ExparationDate, BeginDate, EndDate; create; update; }

@@ -13,10 +13,12 @@ class test_auction_beh definition final for testing
 
     class-data cut type ref to lhc_Auction.
     class-data late_reported type response for reported late zi_khr_auction.
+    class-data customer_mock_data type standard table of /dmo/customer.
 
     data setAuctionStatus_keys type table for determination zi_khr_auction~setAuctionStatus.
     data cancelAuction_keys type table for action import zi_khr_auction~cancelAuction.
     data startBargain_keys type table for action import zi_khr_auction~startBargaining.
+
 
     class-methods class_setup.
     class-methods class_teardown.
@@ -33,6 +35,7 @@ class test_auction_beh definition final for testing
 
     "validation tests
     methods validateDatesTest for testing raising cx_static_check.
+    methods validateHolder for testing raising cx_static_check.
 endclass.
 
 class test_auction_beh implementation.
@@ -47,6 +50,8 @@ class test_auction_beh implementation.
 *                                                   i_select_base_dependencies = abap_true ).
 *    environment->enable_double_redirection( ).
     environment_db = cl_osql_test_environment=>create( i_dependency_list = value #( ( '/DMO/CUSTOMER' ) ) ).
+
+    customer_mock_data = value #( ( customer_id = '228' last_name = 'Gump 228'  ) ).
   endmethod.
 
   method class_teardown.
@@ -57,6 +62,8 @@ class test_auction_beh implementation.
   method setup.
     environment->clear_doubles(  ).
     environment_db->clear_doubles(  ).
+
+    environment_db->insert_test_data( customer_mock_data ).
   endmethod.
 
   method teardown.
@@ -213,7 +220,7 @@ class test_auction_beh implementation.
             reported = reported
      ).
 
-     "Then
+    "Then
     cl_abap_unit_assert=>assert_not_initial( msg = 'Nothing failed?' act = failed ).
     cl_abap_unit_assert=>assert_equals( msg = 'Failed entry found?'
                                         act = failed-auction[ 1 ]-AuctionUuid
@@ -249,6 +256,45 @@ class test_auction_beh implementation.
                    ( AuctionUuid = '2' %param-AuctionUuid = '2' %param-OverallStatus = 'P' ) ).
     sort act ascending by AuctionUuid.
     cl_abap_unit_assert=>assert_equals( msg = 'Read result error' exp = exp act = act ).
+  endmethod.
+
+  method validateholder.
+    "Given
+    auction_mock = value #( ( AuctionUuid = '1' HolderId = '228' )
+                            ( AuctionUuid = '2' HolderId = '328' ) ).
+    environment->insert_test_data( auction_mock ).
+
+    data reported type response for reported late zi_khr_auction.
+    data failed type response for failed late zi_khr_auction.
+    data validateHolder_keys type table for validation zi_khr_auction~validateHolder.
+
+    validateHolder_keys = value #( ( AuctionUuid = '1' ) ( AuctionUuid = '2' ) ( AuctionUuid = '3' )  ).
+
+    select * from /dmo/customer into table @data(cuts).
+    "When
+    cut->validateHolder(
+        exporting
+            keys = corresponding #( validateHolder_keys )
+        changing
+            failed = failed
+            reported = reported
+     ).
+
+    "Then
+    cl_abap_unit_assert=>assert_not_initial( msg = 'Nothing failed?' act = failed ).
+    cl_abap_unit_assert=>assert_equals( msg = 'Failed entry found?'
+                                        act = failed-auction[ 1 ]-AuctionUuid
+                                        exp = auction_mock[ 2 ]-AuctionUuid ).
+
+    cl_abap_unit_assert=>assert_not_initial( msg = 'Nothing reported?' act = reported ).
+    data(reported_auction) = reported-auction[ 2 ].
+    cl_abap_unit_assert=>assert_equals( msg = 'Reported auction Uuid'
+                                        act = reported_auction-AuctionUuid
+                                        exp = auction_mock[ 2 ]-AuctionUuid ).
+    cl_abap_unit_assert=>assert_equals( msg = 'Reported auction element'
+                                        act = reported_auction-%element-holderid
+                                        exp = if_abap_behv=>mk-on ).
+    cl_abap_unit_assert=>assert_bound( msg = 'Message bound to wrong element?' act = reported_auction-%msg ).
   endmethod.
 
 endclass.

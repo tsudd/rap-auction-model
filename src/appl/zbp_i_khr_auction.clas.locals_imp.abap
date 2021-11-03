@@ -45,9 +45,6 @@ class lhc_Auction definition inheriting from cl_abap_behavior_handler friends te
     methods setAuctionStatus for determine on save
       importing keys for Auction~setAuctionStatus.
 
-    methods setAllBidding for determine on save
-      importing keys for Auction~setAllBidding.
-
     methods validateDates for validate on save
       importing keys for Auction~validateDates.
 
@@ -56,9 +53,6 @@ class lhc_Auction definition inheriting from cl_abap_behavior_handler friends te
 
     methods validatePrices for validate on save
       importing keys for Auction~validatePrices.
-
-    methods setBidCurrencyCodes for modify
-      importing keys for action  Auction~setBidCurrencyCodes.
 
 endclass.
 
@@ -314,21 +308,21 @@ class lhc_Auction implementation.
     endif.
 
     loop at auctions into data(auction).
-      append value #(  %tky               = auction-%tky
-                       %state_area        = 'Invalding_Holder' )
-      to reported-auction.
-
       if auction-HolderId is initial or not line_exists( holders_db[ customer_id = auction-HolderId ] ).
         append value #( %tky = auction-%tky ) to failed-auction.
 
         append value #( %tky        = auction-%tky
-                        %state_area = 'Invalding_Holder'
+                        %state_area = 'VALIDATE_HOLDER'
                         %msg        = new zcm_khr(
                                           severity = if_abap_behv_message=>severity-error
                                           textid   = zcm_khr=>holder_unknown
                                           customerid = auction-HolderId )
                         %element-HolderId = if_abap_behv=>mk-on )
           to reported-auction.
+      else.
+        append value #(  %tky               = auction-%tky
+                       %state_area        = 'VALIDATE_HOLDER' )
+        to reported-auction.
       endif.
     endloop.
   endmethod.
@@ -432,82 +426,6 @@ class lhc_Auction implementation.
     update_granted = abap_true. " full access for testing
   endmethod.
 
-  method setBidCurrencyCodes.
-    read entities of zi_khr_auction in local mode
-        entity Auction by \_Bid
-        fields ( BiddingUuid )
-        with corresponding #( keys )
-        result data(biddings)
-        failed data(read_failed).
-
-    modify entities of zi_khr_auction in local mode
-        entity Bid
-            execute setCurrencyCode
-            from corresponding #( biddings )
-        reported data(set_reported).
-  endmethod.
-
-  method setallbidding.
-    data biddings_upd type table for update zi_khr_auction\\Bid.
-    data biddings_crt type standard table of zkhr_bid with default key.
-
-    read entities of zi_khr_auction in local mode
-        entity Auction by \_Bid
-        fields ( BiddingId BidAmount )
-        with corresponding #( keys )
-    result data(biddings)
-    failed data(failed_bids)
-    reported data(reported_bids).
-
-    loop at keys into data(k).
-      data sum_bid like line of biddings.
-      sum_bid = value #( BiddingId = sum_bid_id BidDate = cl_abap_context_info=>get_system_date(  ) ).
-      loop at biddings into data(bid) where BiddingId > sum_bid_id and AuctionUuid = k-AuctionUuid.
-        sum_bid-BidAmount += bid-BidAmount.
-      endloop.
-
-      if line_exists( biddings[ BiddingId = sum_bid_id AuctionUuid = k-AuctionUuid ] ).
-        insert value #( %tky = k-%tky
-                        BiddingId = sum_bid-BiddingId
-                        BidDate = sum_bid-BidDate
-                        BiddingUuid = biddings[ BiddingId = sum_bid_id
-                                                AuctionUuid = k-AuctionUuid ]-BiddingUuid ) into table biddings_upd.
-      else.
-*        modify entities of zi_khr_auction in local mode
-*        entity Auction
-*            update fields ( AuctionUuid ) with value #( ( %cid = 'nice'
-*                                                          %is_draft            = if_abap_behv=>mk-off
-*                                                          AuctionUuid = k-AuctionUuid ) )
-*            create by \_Bid
-*            fields ( BiddingId BidDate BidAmount ) with value #( ( %cid_ref = 'nice'
-*                                                                   %target = value #( ( %cid = 'bruh'
-*                                                                                        %is_draft    = if_abap_behv=>mk-off
-*                                                                                        BiddingId = sum_bid-BiddingId
-*                                                                                        BidAmount = sum_bid-BidAmount
-*                                                                                        BidDate = sum_bid-BidDate ) ) ) )
-*        mapped data(mapped_b)
-*        failed data(failed_b)
-*        reported data(rep_crt).
-
-        insert value #( bidding_id = sum_bid-BiddingId
-                        bid_date = sum_bid-BidDate
-                        auction_uuid = k-AuctionUuid
-                        bid_amount = sum_bid-BidAmount ) into table biddings_crt.
-*        insert value #( BiddingId = sum_bid-BiddingId ) into table zkhr_bid.
-      endif.
-    endloop.
-
-    modify entities of zi_khr_auction in local mode
-        entity Bid
-        update fields ( BiddingId BidAmount BidDate ) with biddings_upd
-        reported data(reported_upd).
-
-    insert zkhr_bid from table @biddings_crt.
-
-    reported = corresponding #( deep reported_upd ).
-*    move-corresponding reported_crt-bid to reported-bid.
-  endmethod.
-
 endclass.
 
 class lcl_behavior_saver definition inheriting from cl_abap_behavior_saver
@@ -526,7 +444,22 @@ class lcl_behavior_saver implementation.
 
 
   method save_modified.
-    data(nice) = 1 + 1.
+    if update-auction is not initial.
+      loop at update-auction into data(auction).
+        select auction_uuid, currency_code
+        from zkhr_bid
+        where auction_uuid = @auction-AuctionUuid
+        into table @data(biddings).
+
+        if biddings is not initial and biddings[ 1 ]-currency_code <> auction-CurrencyCode.
+          update zkhr_bid
+          set currency_code = @auction-CurrencyCode
+          where auction_uuid = @auction-AuctionUuid.
+        endif.
+
+
+      endloop.
+    endif.
   endmethod.
 
 endclass.

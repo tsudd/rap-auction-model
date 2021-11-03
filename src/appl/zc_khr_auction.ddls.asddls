@@ -31,6 +31,8 @@ define root view entity zc_khr_auction
       @Consumption.valueHelpDefinition: [{ entity: { name: 'I_Currency', element: 'Currency'} }]
       CurrencyCode,
       @Consumption.valueHelpDefinition: [{ entity: { name: 'ZI_KHR_STATUS', element: 'Description'} }]
+//      @Consumption.valueHelpDefinition.presentationVariantQualifier: ''
+//      @Consumption.valueHelp: 'ZI_KHR_SATUS'
       OverallStatus,
       LocalLastChangedAt,
       /* Associations */

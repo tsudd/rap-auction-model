@@ -7,6 +7,7 @@
     sizeCategory: #S,
     dataClass: #MIXED
 }
+@ObjectModel.resultSet.sizeCategory: #XS
 define view entity zi_khr_status
   as select from zkhr_auction_sts
 {

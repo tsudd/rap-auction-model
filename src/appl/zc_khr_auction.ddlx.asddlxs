@@ -6,10 +6,11 @@
   presentationVariant: [{ sortOrder: [{ by: 'AuctionId', direction:  #DESC }] }] }
 annotate view zc_khr_auction with
 {
-  @UI.facet: [ { id:              'Auction',
+  @UI.facet: [ { id:              'GeneralInfo',
                    purpose:         #STANDARD,
-                   type:            #IDENTIFICATION_REFERENCE,
-                   label:           'Auction',
+                   type:            #COLLECTION,
+                   isSummary: true,
+                   label:           'General Info',
                    position:        10 },
                  { id:              'Bidding',
                    purpose:         #STANDARD,
@@ -22,53 +23,138 @@ annotate view zc_khr_auction with
                    type:            #LINEITEM_REFERENCE,
                    label:           'Items',
                    position:        30,
-                   targetElement:   '_Item'} ]
-
-
+                   targetElement:   '_Item'},
+                   { label: 'Owner',
+                     id : 'Owner',
+                     type: #FIELDGROUP_REFERENCE,
+                     targetQualifier : 'Owner',
+                     parentId : 'GeneralInfo',
+                     position: 20  },
+                     { label: 'Auction',
+                     id : 'Auction',
+                     type: #FIELDGROUP_REFERENCE,
+                     targetQualifier : 'Auction',
+                     parentId : 'GeneralInfo',
+                     position: 30  },
+                     { label: 'Prices',
+                     id : 'Price',
+                     type: #FIELDGROUP_REFERENCE,
+                     targetQualifier : 'Price',
+                     parentId : 'GeneralInfo',
+                     position: 40  } ]
   @UI:{ identification: [{ position: 1, label: 'Auction UUID' }] }
+  @UI.fieldGroup: [{
+    qualifier: 'Auction',
+    importance: #HIGH,
+    position: 10
+  }]
   AuctionUuid;
   @UI: {  lineItem:       [ { position: 10 } ],
         identification: [ { position: 10 } ],
         selectionField: [ { position: 10 } ] }
+  @UI.fieldGroup: [{
+    qualifier: 'Auction',
+    importance: #HIGH,
+    position: 20
+  }]
   AuctionId;
   @UI: {  lineItem:       [ { position: 20 } ],
-        identification: [ { position: 20 } ],
-        selectionField: [ { position: 20 } ] }
+        selectionField: [ { position: 20 } ],
+         identification: [ { position: 40 } ] }
+  @UI.fieldGroup: [{
+    qualifier: 'Owner',
+    importance: #HIGH,
+    position: 10
+  }]
   HolderId;
   @UI: {  lineItem:       [ { position: 30 } ],
-        identification: [ { position: 30 } ],
-        selectionField: [ { position: 30 } ] }
+        selectionField: [ { position: 30 } ],
+        identification: [ { position: 40 } ]  }
+  @UI.fieldGroup: [{
+    qualifier: 'Owner',
+    importance: #HIGH,
+    position: 20
+  }]
+  @UI.dataPoint: {
+    description: 'Owner',
+    title: 'Auction owner'
+  }
   CustomerName;
   @UI: {  lineItem:       [ { position: 40 } ],
         identification: [ { position: 40 } ],
         selectionField: [ { position: 40 } ] }
+  @UI.fieldGroup: [{
+    qualifier: 'Auction',
+    importance: #HIGH,
+    position: 30
+  }]
   BeginDate;
   @UI: {  lineItem:       [ { position: 50 } ],
         identification: [ { position: 50 } ],
         selectionField: [ { position: 50 } ] }
+  @UI.fieldGroup: [{
+    qualifier: 'Auction',
+    importance: #HIGH,
+    position: 40
+  }]
   EndDate;
   @UI: {  lineItem:       [ { position: 60 } ],
         identification: [ { position: 60 } ],
         selectionField: [ { position: 60 } ] }
+  @UI.fieldGroup: [{
+    qualifier: 'Auction',
+    importance: #HIGH,
+    position: 50
+  }]
   ExparationDate;
   @UI: {  lineItem:       [ { position: 70 } ],
         identification: [ { position: 70 } ],
         selectionField: [ { position: 70 } ] }
+  @UI.fieldGroup: [{
+    qualifier: 'Price',
+    importance: #HIGH,
+    position: 20
+  }]
   BidIncrement;
   @UI: {  lineItem:       [ { position: 80 } ],
         identification: [ { position: 80 } ],
         selectionField: [ { position: 80 } ] }
+  @UI.fieldGroup: [{
+    qualifier: 'Price',
+    importance: #HIGH,
+    position: 10
+  }]
   StartPrice;
   @UI: {  lineItem:       [ { position: 81 } ],
         selectionField: [ { position: 81 } ] }
+  @UI.fieldGroup: [{
+    label: 'Highest bid',
+    qualifier: 'Price',
+    importance: #HIGH,
+    position: 30
+  }]
+  @UI.dataPoint: {
+    description: 'Highest bid',
+    title: 'Highest bid'
+  }
   HighestBid;
   @UI: {  lineItem:       [ { position: 90 } ],
         identification: [ { position: 90 } ],
         selectionField: [ { position: 90 } ] }
+  @UI.fieldGroup: [{
+    qualifier: 'Auction',
+    importance: #HIGH,
+    position: 70
+  }]
   Description;
   @UI: {  lineItem:       [ { position: 100 } ],
         identification: [ { position: 100 } ],
         selectionField: [ { position: 100 } ] }
+  @UI.fieldGroup: [{
+    qualifier: 'Price',
+    importance: #HIGH,
+    position: 11
+  }]
   CurrencyCode;
   @UI: {  lineItem:       [ { position: 110 },
                             { type: #FOR_ACTION, dataAction: 'startBargaining', label: 'Start'},
@@ -77,8 +163,17 @@ annotate view zc_khr_auction with
                             { type: #FOR_ACTION, dataAction: 'startBargaining', label: 'Start auction'},
                             { type: #FOR_ACTION, dataAction: 'cancelAuction', label: 'Cancel'} ],
         selectionField: [ { position: 110 } ] }
+  @UI.dataPoint: {
+    description: 'Status',
+    title: 'Status'
+  }
+  @UI.fieldGroup: [{
+    qualifier: 'Auction',
+    importance: #HIGH,
+    position: 11
+  }]
   OverallStatus;
   @UI.hidden: true
   LocalLastChangedAt;
 
-} 
+}
