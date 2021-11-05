@@ -8,13 +8,13 @@ define root view entity zc_khr_auction
   key AuctionUuid,
   @Search.defaultSearchElement: true
       AuctionId,
-      @Consumption.valueHelpDefinition: [{ entity: { name: '/DMO/I_Customer', element: 'CustomerId'} }]
-      @ObjectModel.text.element: ['CustomerName']
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'zi_khr_holder', element: 'HolderId'} }]
+      @ObjectModel.text.element: ['HolderName']
       @Search.defaultSearchElement: true
       HolderId,
-      @Consumption.valueHelpDefinition: [{ entity: { name: '/DMO/I_Customer', element: 'LastName'} }]
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'zi_khr_holder', element: 'LastName'} }]
       @Search.fuzzinessThreshold: 0.8
-      _Customer.LastName as CustomerName,
+      _Holder.LastName as HolderName,
       @Consumption.filter: { selectionType: #INTERVAL, multipleSelections: false }
       BeginDate,
       @Consumption.filter: { selectionType: #INTERVAL, multipleSelections: false }
@@ -39,5 +39,5 @@ define root view entity zc_khr_auction
       _Bid : redirected to composition child zc_khr_bid,
       _Item : redirected to composition child zc_khr_item,
       _Currency,
-      _Customer
+      _Holder
 }

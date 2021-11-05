@@ -5,11 +5,11 @@ define root view entity zi_khr_auction
 
   composition [0..*] of zi_khr_bid      as _Bid 
   composition [0..*] of zi_khr_itemm as _Item
-  association [0..1] to /DMO/I_Customer as _Customer on $projection.HolderId = _Customer.CustomerID
   association [0..1] to I_Currency      as _Currency on $projection.CurrencyCode = _Currency.Currency
+//  association [0..1] to /DMO/I_Customer as _Customer on $projection.HolderId = _Customer.CustomerID
   association to zi_khr_maxbid as _MaxBid on $projection.AuctionUuid = _MaxBid.AuctionUuid
                                              and $projection.CurrencyCode = _MaxBid.CurrencyCode
-
+  association [0..1] to zi_khr_holder as _Holder on $projection.HolderId = _Holder.HolderId
 {
   key AuctionUuid,
       AuctionId,
@@ -24,7 +24,6 @@ define root view entity zi_khr_auction
       Description,
       CurrencyCode,
       OverallStatus,
-      
       _MaxBid.HighestBidAmount as HighestBid,
        @Semantics.user.createdBy: true
       CreatedBy,
@@ -38,9 +37,10 @@ define root view entity zi_khr_auction
       @Semantics.systemDateTime.localInstanceLastChangedAt: true
       LocalLastChangedAt,
 
-      _Customer,
       _Currency,
       _Bid,
       _Item,
-      _MaxBid
+      _MaxBid,
+//      _Customer,
+      _Holder
 }
